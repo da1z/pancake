@@ -15,7 +15,7 @@ type argsT = yargs.Arguments<yargs.InferredOptionTypes<typeof args>>;
 
 export const command = 'freeze [branch]';
 export const canonical = 'branch freeze';
-export const aliases = ['fr'];
+export const aliases = ['fz'];
 export const description =
   'Mark a branch as frozen to prevent accidental modifications.';
 export const builder = args;

@@ -7,7 +7,12 @@
       "Bash(yarn turbo test:*)",
       "Bash(npx turbo build)",
       "Bash(node dist/src/index.js:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(node /Users/kirylchetyrbak/Projects/charcoal/apps/cli/dist/src/index.js bc:*)",
+      "Bash(node:*)",
+      "Bash(yarn build)",
+      "Bash(yarn test-one:*)"
     ]
   }
 }

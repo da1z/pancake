@@ -133,6 +133,7 @@ export type TEngine = {
   isBranchEmpty: (branchName: string) => boolean;
   populateRemoteShas: () => Promise<void>;
   branchMatchesRemote: (branchName: string) => boolean;
+  branchExistsOnRemote: (branchName: string) => boolean;
 
   pushBranch: (branchName: string, forcePush: boolean) => void;
   pullTrunk: () => 'PULL_DONE' | 'PULL_UNNEEDED' | 'PULL_CONFLICT';
@@ -931,6 +932,9 @@ export function composeEngine({
       const cachedMeta = assertBranchIsValidOrTrunkAndGetMeta(branchName);
       const remoteParentRevision = git.getRemoteSha(branchName);
       return cachedMeta.branchRevision === remoteParentRevision;
+    },
+    branchExistsOnRemote: (branchName: string) => {
+      return git.getRemoteSha(branchName) !== undefined;
     },
     pushBranch: (branchName: string, forcePush: boolean) => {
       assertBranchIsValidAndNotTrunkAndGetMeta(branchName);

@@ -2,10 +2,10 @@ import chalk from 'chalk';
 import { TContext } from '../lib/context';
 import { ExitFailedError } from '../lib/errors';
 
-export function freezeBranchAction(
+export async function freezeBranchAction(
   args: { branchName?: string },
   context: TContext
-): void {
+): Promise<void> {
   const branchName =
     args.branchName ?? context.engine.currentBranchPrecondition;
 
@@ -19,17 +19,17 @@ export function freezeBranchAction(
     );
   }
 
-  const prInfo = context.engine.getPrInfo(branchName);
-  if (!prInfo?.number) {
+  await context.engine.populateRemoteShas();
+  if (!context.engine.branchExistsOnRemote(branchName)) {
     throw new ExitFailedError(
       [
         `Cannot freeze branch ${chalk.yellow(
           branchName
-        )} - it has not been submitted yet.`,
-        `Freezing is intended for branches in collaborative workflows that have been pushed to remote.`,
+        )} - it has not been pushed to remote yet.`,
+        `Freezing is intended for branches in collaborative workflows that exist on remote.`,
         `Use ${chalk.cyan('gt stack submit')} or ${chalk.cyan(
           'gt branch submit'
-        )} first.`,
+        )} to push first.`,
       ].join('\n')
     );
   }
