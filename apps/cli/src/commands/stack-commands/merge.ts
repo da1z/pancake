@@ -100,7 +100,10 @@ function getCheckStatus(prNumber: number): CheckInfo {
     const checks = JSON.parse(result) as Array<{ state: string; name: string }>;
 
     const pending = checks.filter(
-      (c) => c.state === 'PENDING' || c.state === 'QUEUED'
+      (c) =>
+        c.state === 'PENDING' ||
+        c.state === 'QUEUED' ||
+        c.state === 'IN_PROGRESS'
     ).length;
     const failing = checks.filter(
       (c) => c.state === 'FAILURE' || c.state === 'ERROR'
@@ -130,7 +133,6 @@ function mergePR(prNumber: number, method: MergeOpts['method']): void {
     'merge',
     `${prNumber}`,
     `--${method}`,
-    '--auto',
     '--delete-branch=false',
   ]);
 }
