@@ -130,11 +130,16 @@ function getCheckStatus(prNumber: number): CheckInfo {
 }
 
 function mergePR(prNumber: number, method?: MergeOpts['method']): void {
-  const args = ['pr', 'merge', `${prNumber}`, '--delete-branch=false'];
-  if (method) {
-    args.push(`--${method}`);
-  }
-  execFileSync('gh', args);
+  // gh pr merge requires explicit method in non-interactive mode
+  // Default to squash if not specified
+  const mergeMethod = method || 'squash';
+  execFileSync('gh', [
+    'pr',
+    'merge',
+    `${prNumber}`,
+    `--${mergeMethod}`,
+    '--delete-branch=false',
+  ]);
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -221,17 +226,20 @@ async function waitUntilMergeable(
       return 'success';
     }
 
-    // BLOCKED means branch protection rules not satisfied (checks failing or missing approvals)
-    // DIRTY means merge conflicts exist
-    if (
-      prInfo.mergeStateStatus === 'BLOCKED' ||
-      prInfo.mergeStateStatus === 'DIRTY'
-    ) {
+    // DIRTY means merge conflicts exist - fail immediately
+    if (prInfo.mergeStateStatus === 'DIRTY') {
+      return 'failure';
+    }
+
+    // Check actual check status to determine if we should fail or keep waiting
+    const checkInfo = getCheckStatus(prNumber);
+
+    // If checks have failed, return failure
+    if (checkInfo.state === 'failure') {
       return 'failure';
     }
 
     // Log status for user visibility
-    const checkInfo = getCheckStatus(prNumber);
     if (checkInfo.total === 0) {
       context.splog.info(
         `PR #${prNumber} (${branchName}): Waiting for checks to start...`
