@@ -51,37 +51,6 @@ This is useful when multiple people are working on a stack and you want to preve
 - **Branch traversal fix**: Fixed an issue where `repo sync` could get into an invalid state if a branch was deleted in the middle of a stack
 - **PR body footer fix**: Fixed duplication of the dependency tree footer when external bots (like CI/linters) add content to PR descriptions
 
-## Install
-
-Build from source:
-```bash
-git clone https://github.com/da1z/pancake.git
-cd pancake/apps/cli
-npm install
-npm run build
-npm link  # Makes 'pk' command available globally
-```
-
-### Using the original `gt` alias
-
-The default command is `pk`, but if you prefer to use the original Graphite `gt` command, add an alias to your shell configuration:
-
-```bash
-# Add to ~/.zshrc or ~/.bashrc
-alias gt="pk"
-```
-
-Then reload your shell:
-```bash
-source ~/.zshrc
-```
-
-Now you can use either `pk` or `gt`:
-```bash
-gt stack submit  # works
-pk stack submit  # also works
-```
-
 ## Quick Start
 
 ```bash
