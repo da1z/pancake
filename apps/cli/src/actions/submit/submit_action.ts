@@ -142,11 +142,13 @@ export async function submitAction(
 
 	for (const branch of branchNames) {
 		const prInfo = context.engine.getPrInfo(branch);
-		const footer = createPrBodyFooter(context, branch);
 
+		// Skip branches that don't have PRs yet
 		if (!prInfo) {
-			throw new Error(`PR info is undefined for branch ${branch}`);
+			continue;
 		}
+
+		const footer = createPrBodyFooter(context, branch);
 
 		const prFooterChanged = !prInfo.body?.includes(footer);
 
