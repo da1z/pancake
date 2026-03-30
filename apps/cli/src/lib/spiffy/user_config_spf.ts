@@ -19,6 +19,7 @@ const schema = t.shape({
 	pager: t.optional(t.string),
 	restackCommitterDateIsAuthorDate: t.optional(t.boolean),
 	submitIncludeCommitMessages: t.optional(t.boolean),
+	submitPancakeAttribution: t.optional(t.boolean),
 	connectCliToLocalServer: t.optional(t.boolean),
 	gtiConfigs: t.optional(
 		t.array(

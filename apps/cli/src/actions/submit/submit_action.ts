@@ -4,11 +4,7 @@ import type { TContext } from "../../lib/context";
 import type { TScopeSpec } from "../../lib/engine/scope_spec";
 import { ExitFailedError, KilledError } from "../../lib/errors";
 import { CommandFailedError } from "../../lib/git/runner";
-import {
-	createPrBodyFooter,
-	footerFooter,
-	footerTitle,
-} from "../create_pr_body_footer";
+import { createPrBodyFooter, footerFooter } from "../create_pr_body_footer";
 import { getPRInfoForBranches } from "./prepare_branches";
 import { submitPullRequest } from "./submit_prs";
 import { validateBranchesToSubmit } from "./validate_branches";
@@ -180,23 +176,24 @@ export function updatePrBodyFooter(
 		return footer;
 	}
 
-	// Get the core title and footer text without extra whitespace
-	const titleText = footerTitle.trim().replace(/^\s*\n+|\n+\s*$/g, "");
 	const footerText = footerFooter.trim().replace(/^\s*\n+|\n+\s*$/g, "");
 
-	const escapedTitleText = titleText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 	const escapedFooterText = footerText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-	// Match ALL Pancake footers (not just at end of string)
-	// This handles cases where external bots add content after our footer,
-	// and also cleans up any duplicate footers that may exist
-	const footerPattern = new RegExp(
-		`\\n*${escapedTitleText}[\\s\\S]*?${escapedFooterText}`,
+	const dependencyTreeHeader = `(?:\\n\\n\\n|\\n\\n)#### PR Dependency Tree\\n\\n`;
+	const regexTreeSectionWithCredit = new RegExp(
+		`${dependencyTreeHeader}[\\s\\S]*?${escapedFooterText}`,
+		"g",
+	);
+	const prTreeLineRegex = `(?:\\n[ ]*\\* \\*\\*PR #\\d+\\*\\*(?: 👈)?)+`;
+	const regexTreeSectionWithoutCredit = new RegExp(
+		`${dependencyTreeHeader}${prTreeLineRegex}`,
 		"g",
 	);
 
-	// Remove all existing footers
-	const bodyWithoutFooters = body.replace(footerPattern, "");
+	const bodyWithoutFooters = body
+		.replace(regexTreeSectionWithCredit, "")
+		.replace(regexTreeSectionWithoutCredit, "");
 
 	return bodyWithoutFooters + footer;
 }
